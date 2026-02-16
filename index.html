@@ -151,38 +151,37 @@
             color: #666;
         }
         
-        /* Daily Summary */
-        .summary-section {
-            background: rgba(255, 200, 100, 0.05);
-            border: 1px solid rgba(255, 200, 100, 0.15);
+        /* Impeachment Watch */
+        .impeachment-section {
+            background: rgba(255, 100, 100, 0.05);
+            border: 1px solid rgba(255, 100, 100, 0.15);
         }
         
-        .summary-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .impeachment-item {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         
-        .summary-list li {
-            font-size: 1rem;
-            color: #ccc;
-            line-height: 1.6;
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .summary-list li:last-child {
+        .impeachment-item:last-child {
             border-bottom: none;
         }
         
-        .summary-list li::before {
-            content: "•";
-            color: #ff6b35;
-            font-weight: bold;
-            position: absolute;
-            left: 8px;
+        .impeachment-item a {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-size: 1.05rem;
+            display: block;
+            transition: color 0.2s;
+        }
+        
+        .impeachment-item a:hover {
+            color: #ff9999;
+        }
+        
+        .coming-soon {
+            color: #888;
+            font-style: italic;
+            font-size: 1.1rem;
         }
         
         /* Footer */
@@ -239,12 +238,30 @@
             <div class="jail-emoji">😔</div>
         </section>
         
-        <!-- Daily Summary -->
-        <section class="section summary-section">
+        <!-- Impeachment Watch -->
+        <section class="section impeachment-section">
             <h2 class="section-title">
-                <span class="icon">📋</span> What's New
+                <span class="icon">⚖️</span> Impeachment Watch
             </h2>
-            <ul class="summary-list"><li>Bondi criticised after saying all Epstein files have been released (BBC)</li><li>Epstein files fallout: The high-profile people burned by past dealings with a... (CNBC)</li><li>Epstein’s Ties With Academics Show the Seedy Side of College Fund-Raising (The New York Times)</li></ul>
+            
+            <div class="impeachment-item">
+                <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxNSEN4TWg5N1V2ZTFodUs2VjJLaWhUTFVkM2gtVFZUTVJWU2htTWRCNFVZakZRbjBvMTduNXRYUUhVUnItRzFULUljWkE4U1hfZjhOckl6c20zaF83aWRaQTIweGFIbW9LNVVGRXUtYkxrN3RETi1JYTJSSXF5bXlkeGJIRDBSWGJHVVhReTI4Y9IBlAFBVV95cUxQMll4YUNRSWFES243WlNQSHdCeE1GaTkxb2tPZm10NTlIdG41SE52RHZxNVdlZDc0RFEwRTFDdUV0WkgyOXlVM2NIVy1ER3hmOUhCTF9zRWgyTGhjYzdic1ZGc1MzR3ktZ0pXRGVONWZtdW9pczUzWDBGSGJLVVNYcEpVaTV5Szhsc2gwVDUyejNlaTNh?oc=5" target="_blank" rel="noopener">
+                    Ty Cobb rips Trump admin over political attacks: ‘All those people should be impeached’
+                </a>
+                <div class="news-source">The Hill</div>
+            </div>
+            <div class="impeachment-item">
+                <a href="https://news.google.com/rss/articles/CBMi9AFBVV95cUxOeEw3MDZ3QUxUcFlpMXR0VWlKSjNYX2x3QmpJeUZkNjhtOFYzRjVEbG9BODdjUGdrU092Nkk4MWJxeE13bWpISEk1Y0JPMGE3SDF0UnhKLVQ0QTNOMjdxU0ZLRFZ3ZWF5YXd0Nm5idzdjaDZpZm9QSW1Mand1Q2Q5M0drZVd2Mmt4aDRpQWRyRUl4MEp3SVcxQmtzR3VYQVoxaXYtc3c2OUdydTczbEJ1OVpVWWhCY05Qb01SVzZxYkhicG1GMDlHa1ktTjF0al9mOGFVTHNpMF9SUUExeGEyQmxFMmFTaWlNRkpOdC1Nb2JBeG5n?oc=5" target="_blank" rel="noopener">
+                    What is presidential approval rating amid growing calls to impeach Trump?
+                </a>
+                <div class="news-source">PhillyBurbs</div>
+            </div>
+            <div class="impeachment-item">
+                <a href="https://news.google.com/rss/articles/CBMihgFBVV95cUxNWW1ESzNoMEJETjk1RFo5amVpUGFidXUya21FbXRRZU9tenI1U3V6YnNCdTFxa1FnMlZNVDE2aV8tdk10eUM5MjFLM0lXS3oyRWYtaDhIVE9DUmJRRlZXdzFQM0tNYUNQLUlNT2dHQVNhSDk5TmFXQk5sYUVORFRRLVlIdXBudw?oc=5" target="_blank" rel="noopener">
+                    Trump’s Second Acquittal: A Day That Should Live in Infamy
+                </a>
+                <div class="news-source">The Dispatch</div>
+            </div>
         </section>
         
         <!-- Reddit Section -->
@@ -259,8 +276,8 @@
                     <span class="post-title">🇫🇷BREAKING: France has put together an elite team of prosecutors to analyze the Epstein Files and investigate French nationals involved in Epstein&#x27;s crimes.</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 26,530</span>
-                    <span class="comments">💬 620</span>
+                    <span class="upvotes">⬆️ 26,608</span>
+                    <span class="comments">💬 621</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -268,7 +285,7 @@
                     <span class="post-title">BREAKING: Rep. Nancy Mace says all the audio and all the video from all the pinhole cameras at all of Jeffrey Epstein’s properties are missing from the Epstein files</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 6,468</span>
+                    <span class="upvotes">⬆️ 6,496</span>
                     <span class="comments">💬 300</span>
                 </div>
             </div>
@@ -277,8 +294,8 @@
                     <span class="post-title">W China!! Do you guys think this can happen in the US ?</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 1,899</span>
-                    <span class="comments">💬 253</span>
+                    <span class="upvotes">⬆️ 1,903</span>
+                    <span class="comments">💬 254</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -286,8 +303,8 @@
                     <span class="post-title">Anyone else kinda losing their shit?</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 3,719</span>
-                    <span class="comments">💬 739</span>
+                    <span class="upvotes">⬆️ 3,718</span>
+                    <span class="comments">💬 741</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -295,8 +312,8 @@
                     <span class="post-title">2 FBI agents killed in Mexico investigating Epstein, SEAL TEAM 6 Commander Richard Marcinko - How is this Epstein file not front page news</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 1,382</span>
-                    <span class="comments">💬 43</span>
+                    <span class="upvotes">⬆️ 1,384</span>
+                    <span class="comments">💬 44</span>
                 </div>
             </div>
             </div>
@@ -332,7 +349,7 @@
         
         <!-- Footer -->
         <footer>
-            <div class="last-updated">Last updated: February 16, 2026 • 10:47 UTC</div>
+            <div class="last-updated">Last updated: February 16, 2026 • 10:50 UTC</div>
             <a href="https://github.com/DutchPvR/Brokenchocolate" target="_blank">View on GitHub</a>
         </footer>
     </div>
