@@ -157,11 +157,32 @@
             border: 1px solid rgba(255, 200, 100, 0.15);
         }
         
-        .daily-summary {
-            font-size: 1.1rem;
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .summary-list li {
+            font-size: 1rem;
             color: #ccc;
-            line-height: 1.7;
-            font-style: italic;
+            line-height: 1.6;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .summary-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-list li::before {
+            content: "•";
+            color: #ff6b35;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
         }
         
         /* Footer */
@@ -221,9 +242,9 @@
         <!-- Daily Summary -->
         <section class="section summary-section">
             <h2 class="section-title">
-                <span class="icon">📋</span> Today's Summary
+                <span class="icon">📋</span> What's New
             </h2>
-            <p class="daily-summary">Today's Reddit discussions focus on French investigation developments, document releases, FBI involvement questions. Meanwhile, news outlets report on new document releases (BBC), "Epstein files fallout: The high-profile people bur..." (CNBC).</p>
+            <ul class="summary-list"><li>Bondi criticised after saying all Epstein files have been released (BBC)</li><li>Epstein files fallout: The high-profile people burned by past dealings with a... (CNBC)</li><li>Epstein’s Ties With Academics Show the Seedy Side of College Fund-Raising (The New York Times)</li></ul>
         </section>
         
         <!-- Reddit Section -->
@@ -238,8 +259,8 @@
                     <span class="post-title">🇫🇷BREAKING: France has put together an elite team of prosecutors to analyze the Epstein Files and investigate French nationals involved in Epstein&#x27;s crimes.</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 26,424</span>
-                    <span class="comments">💬 618</span>
+                    <span class="upvotes">⬆️ 26,530</span>
+                    <span class="comments">💬 620</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -247,8 +268,8 @@
                     <span class="post-title">BREAKING: Rep. Nancy Mace says all the audio and all the video from all the pinhole cameras at all of Jeffrey Epstein’s properties are missing from the Epstein files</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 6,418</span>
-                    <span class="comments">💬 298</span>
+                    <span class="upvotes">⬆️ 6,468</span>
+                    <span class="comments">💬 300</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -256,8 +277,8 @@
                     <span class="post-title">W China!! Do you guys think this can happen in the US ?</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 1,859</span>
-                    <span class="comments">💬 252</span>
+                    <span class="upvotes">⬆️ 1,899</span>
+                    <span class="comments">💬 253</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -265,8 +286,8 @@
                     <span class="post-title">Anyone else kinda losing their shit?</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 3,707</span>
-                    <span class="comments">💬 738</span>
+                    <span class="upvotes">⬆️ 3,719</span>
+                    <span class="comments">💬 739</span>
                 </div>
             </div>
             <div class="reddit-post">
@@ -274,8 +295,8 @@
                     <span class="post-title">2 FBI agents killed in Mexico investigating Epstein, SEAL TEAM 6 Commander Richard Marcinko - How is this Epstein file not front page news</span>
                 </a>
                 <div class="post-meta">
-                    <span class="upvotes">⬆️ 1,367</span>
-                    <span class="comments">💬 42</span>
+                    <span class="upvotes">⬆️ 1,382</span>
+                    <span class="comments">💬 43</span>
                 </div>
             </div>
             </div>
@@ -311,7 +332,7 @@
         
         <!-- Footer -->
         <footer>
-            <div class="last-updated">Last updated: February 16, 2026 • 10:40 UTC</div>
+            <div class="last-updated">Last updated: February 16, 2026 • 10:47 UTC</div>
             <a href="https://github.com/DutchPvR/Brokenchocolate" target="_blank">View on GitHub</a>
         </footer>
     </div>
