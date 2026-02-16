@@ -4,190 +4,295 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Is Trump in Jail? | Epstein Files Tracker</title>
+    <meta name="description" content="Track whether Trump is in jail and follow the latest Epstein case developments">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            padding: 2rem;
+            color: #ffffff;
+            line-height: 1.6;
         }
+        
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-        }
-        .trump-section {
-            text-align: center;
-            padding: 2rem;
-            margin-bottom: 3rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .answer {
-            font-size: 8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-        }
-        .answer.no {
-            color: #ff6b6b;
-        }
-        .answer.yes {
-            color: #51cf66;
-        }
-        .updated {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
+            padding: 20px;
         }
         
-        /* Epstein Section Styles */
+        /* Trump Jail Status Section */
+        .jail-status {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+        
+        .jail-question {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .jail-question .flag {
+            font-size: 1.2em;
+        }
+        
+        .jail-answer {
+            font-size: clamp(5rem, 20vw, 12rem);
+            font-weight: 900;
+            color: #ff4444;
+            text-shadow: 0 0 60px #ff444440, 0 0 120px #ff444420;
+            letter-spacing: 0.1em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .jail-emoji {
+            font-size: clamp(2rem, 8vw, 4rem);
+            margin-top: 20px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Section Styling */
         .section {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .section h2 {
+        
+        .section-title {
             font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #ffd43b;
-            border-bottom: 2px solid rgba(255,212,59,0.3);
-            padding-bottom: 0.5rem;
+            margin-bottom: 25px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .reddit-posts {
-            list-style: none;
+        
+        .section-title .icon {
+            font-size: 1.3em;
         }
-        .reddit-posts li {
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
-            border-left: 4px solid #ff4500;
+        
+        /* Reddit Posts */
+        .reddit-post {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .reddit-posts li:hover {
-            background: rgba(255,255,255,0.08);
+        
+        .reddit-post:last-child {
+            border-bottom: none;
         }
-        .post-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff4500;
-            margin-right: 0.75rem;
-        }
-        .reddit-posts a {
-            color: #74c0fc;
+        
+        .reddit-post a {
+            color: #ff6b35;
             text-decoration: none;
-            font-weight: 500;
-            line-height: 1.4;
+            font-size: 1.05rem;
+            display: block;
+            transition: color 0.2s;
         }
-        .reddit-posts a:hover {
-            text-decoration: underline;
-            color: #a5d8ff;
+        
+        .reddit-post a:hover {
+            color: #ff8c5a;
         }
+        
+        .post-meta {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            gap: 20px;
+        }
+        
         .upvotes {
-            display: inline-block;
-            font-size: 0.8rem;
             color: #ff4500;
-            margin-top: 0.5rem;
-            opacity: 0.8;
         }
         
-        /* News Section */
-        .news-list {
-            list-style: none;
+        .comments {
+            color: #888;
         }
-        .news-list li {
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
-            border-left: 4px solid #51cf66;
+        
+        /* News Items */
+        .news-item {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .news-list a {
-            color: #74c0fc;
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-item a {
+            color: #4da6ff;
             text-decoration: none;
-            font-weight: 500;
-        }
-        .news-list a:hover {
-            text-decoration: underline;
-        }
-        .news-source {
-            font-size: 0.8rem;
-            color: #868e96;
-            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            display: block;
+            transition: color 0.2s;
         }
         
-        .footer {
+        .news-item a:hover {
+            color: #7dbfff;
+        }
+        
+        .news-source {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Footer */
+        footer {
             text-align: center;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.8rem;
-            opacity: 0.5;
+            padding: 40px 20px;
+            color: #444;
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            color: #888;
+        }
+        
+        .last-updated {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .jail-status {
+                padding: 40px 15px;
+            }
+            
+            .post-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Trump Section -->
-        <div class="trump-section">
-            <h1>🇺🇸 Is Trump in Jail? 🇺🇸</h1>
-            <div class="answer no">NO</div>
-            <p class="updated">Last updated: February 16, 2026 • 10:25 UTC</p>
-        </div>
+        <!-- Trump Jail Status -->
+        <section class="jail-status">
+            <h1 class="jail-question">
+                <span class="flag">🇺🇸</span> Is Trump in Jail? <span class="flag">🇺🇸</span>
+            </h1>
+            <div class="jail-answer">NO</div>
+            <div class="jail-emoji">😔</div>
+        </section>
         
-        <!-- Reddit Hot Topics -->
-        <div class="section">
-            <h2>🔥 Hot on r/Epstein</h2>
-            <ul class="reddit-posts">
-                <li>
-                    <span class="post-number">1.</span>
-                    <a href="https://www.reddit.com/r/Epstein/comments/1r5vinv/" target="_blank">🇫🇷 BREAKING: France has put together an elite team of prosecutors to analyze the Epstein Files and investigate French nationals involved in Epstein's crimes</a>
-                    <div class="upvotes">⬆️ 26,132 upvotes</div>
-                </li>
-                <li>
-                    <span class="post-number">2.</span>
-                    <a href="https://www.reddit.com/r/Epstein/comments/1r5vtnm/" target="_blank">BREAKING: Rep. Nancy Mace says all the audio and video from pinhole cameras at Epstein's properties are missing from the files</a>
-                    <div class="upvotes">⬆️ 6,313 upvotes</div>
-                </li>
-                <li>
-                    <span class="post-number">3.</span>
-                    <a href="https://www.reddit.com/r/Epstein/comments/1r5ywoe/" target="_blank">W China!! Do you guys think this can happen in the US?</a>
-                    <div class="upvotes">⬆️ 1,805 upvotes</div>
-                </li>
-            </ul>
-        </div>
+        <!-- Reddit Section -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">🔥</span> Hot on r/Epstein
+            </h2>
+            <div class="reddit-posts">
+                
+            <div class="reddit-post">
+                <a href="https://reddit.com/r/Epstein/comments/1r5vinv/breaking_france_has_put_together_an_elite_team_of/" target="_blank" rel="noopener">
+                    <span class="post-title">🇫🇷BREAKING: France has put together an elite team of prosecutors to analyze the Epstein Files and investigate French nationals involved in Epstein&#x27;s crimes.</span>
+                </a>
+                <div class="post-meta">
+                    <span class="upvotes">⬆️ 26,349</span>
+                    <span class="comments">💬 613</span>
+                </div>
+            </div>
+            <div class="reddit-post">
+                <a href="https://reddit.com/r/Epstein/comments/1r5vtnm/breaking_rep_nancy_mace_says_all_the_audio_and/" target="_blank" rel="noopener">
+                    <span class="post-title">BREAKING: Rep. Nancy Mace says all the audio and all the video from all the pinhole cameras at all of Jeffrey Epstein’s properties are missing from the Epstein files</span>
+                </a>
+                <div class="post-meta">
+                    <span class="upvotes">⬆️ 6,388</span>
+                    <span class="comments">💬 297</span>
+                </div>
+            </div>
+            <div class="reddit-post">
+                <a href="https://reddit.com/r/Epstein/comments/1r5ywoe/w_china_do_you_guys_think_this_can_happen_in_the/" target="_blank" rel="noopener">
+                    <span class="post-title">W China!! Do you guys think this can happen in the US ?</span>
+                </a>
+                <div class="post-meta">
+                    <span class="upvotes">⬆️ 1,842</span>
+                    <span class="comments">💬 250</span>
+                </div>
+            </div>
+            <div class="reddit-post">
+                <a href="https://reddit.com/r/Epstein/comments/1r5truq/anyone_else_kinda_losing_their_shit/" target="_blank" rel="noopener">
+                    <span class="post-title">Anyone else kinda losing their shit?</span>
+                </a>
+                <div class="post-meta">
+                    <span class="upvotes">⬆️ 3,687</span>
+                    <span class="comments">💬 738</span>
+                </div>
+            </div>
+            <div class="reddit-post">
+                <a href="https://reddit.com/r/Epstein/comments/1r5yjhv/2_fbi_agents_killed_in_mexico_investigating/" target="_blank" rel="noopener">
+                    <span class="post-title">2 FBI agents killed in Mexico investigating Epstein, SEAL TEAM 6 Commander Richard Marcinko - How is this Epstein file not front page news</span>
+                </a>
+                <div class="post-meta">
+                    <span class="upvotes">⬆️ 1,364</span>
+                    <span class="comments">💬 42</span>
+                </div>
+            </div>
+            </div>
+        </section>
         
-        <!-- Epstein Files News -->
-        <div class="section">
-            <h2>📰 Epstein Files - Breaking News</h2>
-            <ul class="news-list">
-                <li>
-                    <a href="https://www.nytimes.com/2026/02/14/world/europe/france-epstein-files.html" target="_blank">France Launches Elite Prosecution Team to Investigate Epstein Files</a>
-                    <div class="news-source">New York Times • Feb 14, 2026</div>
-                </li>
-                <li>
-                    <a href="https://x.com/GeneralMCNews/status/2023165128087142839" target="_blank">Rep. Nancy Mace: All surveillance footage from Epstein properties is missing</a>
-                    <div class="news-source">Social Media • Feb 16, 2026</div>
-                </li>
-                <li>
-                    <a href="https://www.congress.gov" target="_blank">Thomas Massie Questions AG Pam Bondi's Handling of Epstein Files</a>
-                    <div class="news-source">House Judiciary Committee • Feb 2026</div>
-                </li>
-            </ul>
-        </div>
+        <!-- News Section -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="icon">📰</span> Latest Epstein News
+            </h2>
+            <div class="news-items">
+                
+            <div class="news-item">
+                <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5CY29wODVmRHNselZLR19wZmoxeVVQUG96N2I4ek1MOEtacWVwUHVZT2JLNkFBNXdHeWI2THZ1NTFOTXdvcjI4NEJjNHh4V3k2UVg3QUh5ajIwZw?oc=5" target="_blank" rel="noopener">
+                    Bondi criticised after saying all Epstein files have been released
+                </a>
+                <div class="news-source">BBC</div>
+            </div>
+            <div class="news-item">
+                <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxPTFhHTUxKN19Fclp4dDVmUlk2Rm05QWtHWFFXY1FLMS1oeTVyZkV3WTRNQ3B3dnBqaWVweWdXMFJ1a3RSN29oS3YwSUhlUTVKdkJrNzl3LUNjaTBZX1RfbV9Ic2JEZmx2aXR3WG1WZnJsN3I0WkhNQnk3MnlDSGszVjJlVHJtczJrT0lVcWsySVRtZ9IBlwFBVV95cUxPcDFpekJOWm1paGlabUVuMGZjWVNjN192aDBGR3ptSEowZ0h1ZXVGR2V4UmdhZExhSVF5Y1Uwc3ZqWUZWT3hFcDB0QnR3VGxHWEpNYklxalZZMU4ybnJBWmtQQzdNcG4wMUF0b3h0U2JBWWpKNDRkRVNYWEFXb2pKX1JrbGtRRURieGlGNElhM2NNdkxFMEFn?oc=5" target="_blank" rel="noopener">
+                    Epstein files fallout: The high-profile people burned by past dealings with a predator
+                </a>
+                <div class="news-source">CNBC</div>
+            </div>
+            <div class="news-item">
+                <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxPM21rbG52TGNuS3lWYnZpRzE2NXdRZk8tRVBaRTJrcWR2dWdsOVFISTM0b21lb0NiLXVBZmpEYlRsakN2T1BwY1JESlhGTXoxZEtUTVZZcVFEX3daN1dkNHNHbjNPNzV1OVNreDJEZ3N4dWJHcTdpVVVnZlVvT21xbTdPa2dreEF5X0k1Ylp0TWVMMWxUY1I3dHZaZ1plSWRqOTFPQ1BNWm84VkYxS25zYTJRS19mZw?oc=5" target="_blank" rel="noopener">
+                    Epstein’s Ties With Academics Show the Seedy Side of College Fund-Raising
+                </a>
+                <div class="news-source">The New York Times</div>
+            </div>
+            </div>
+        </section>
         
-        <div class="footer">
-            Auto-updated daily at 7:00 AM LA time • Data from r/Epstein
-        </div>
+        <!-- Footer -->
+        <footer>
+            <div class="last-updated">Last updated: February 16, 2026 • 10:36 UTC</div>
+            <a href="https://github.com/DutchPvR/Brokenchocolate" target="_blank">View on GitHub</a>
+        </footer>
     </div>
 </body>
 </html>
