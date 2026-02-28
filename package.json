@@ -4,6 +4,7 @@
   "description": "Is Trump in Jail? | Epstein Files Tracker",
   "private": true,
   "scripts": {
+    "update": "node scripts/update.js",
     "test": "npm run test:html && npm run test:content",
     "test:html": "html-validate index.html",
     "test:content": "node tests/content-check.js",
