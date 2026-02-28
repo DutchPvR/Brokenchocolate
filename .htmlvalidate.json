@@ -1,0 +1,13 @@
+{
+  "extends": ["html-validate:recommended"],
+  "rules": {
+    "no-trailing-whitespace": "off",
+    "long-title": "off",
+    "require-sri": "off",
+    "no-inline-style": "off",
+    "script-type": "off",
+    "wcag/h30": "warn",
+    "wcag/h37": "warn",
+    "wcag/h67": "warn"
+  }
+}

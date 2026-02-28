@@ -1,0 +1,21 @@
+{
+  "name": "brokenchocolate",
+  "version": "1.0.0",
+  "description": "Is Trump in Jail? | Epstein Files Tracker",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:html && npm run test:content",
+    "test:html": "html-validate index.html",
+    "test:content": "node tests/content-check.js",
+    "test:links": "linkinator index.html --skip 'reddit\\.com|x\\.com|twitter\\.com'",
+    "test:a11y": "pa11y index.html --standard WCAG2AA"
+  },
+  "devDependencies": {
+    "html-validate": "^9.0.0",
+    "linkinator": "^6.0.0",
+    "node-html-parser": "^6.0.0"
+  },
+  "optionalDependencies": {
+    "pa11y": "^8.0.0"
+  }
+}
