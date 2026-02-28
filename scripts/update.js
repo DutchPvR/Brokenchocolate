@@ -116,6 +116,34 @@ function formatDate(pubDate) {
 }
 
 // ---------------------------------------------------------------------------
+// Deduplication helpers
+// ---------------------------------------------------------------------------
+
+function normalizeTitle(title) {
+  return title.trim().toLowerCase();
+}
+
+// Read the anchor text of every matching element already on the page.
+function getExistingTitles(root, itemSelector) {
+  return new Set(
+    root.querySelectorAll(`${itemSelector} a`)
+      .map((el) => normalizeTitle(el.text))
+      .filter(Boolean)
+  );
+}
+
+// Remove duplicate titles within a single batch of items.
+function deduplicateWithinBatch(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = normalizeTitle(item.title);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Data fetchers
 // ---------------------------------------------------------------------------
 
@@ -130,10 +158,11 @@ async function fetchRedditPosts() {
   }));
 }
 
-async function fetchGoogleNews(query, maxItems = 5) {
+async function fetchGoogleNews(query) {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
   const rss = await get(url);
-  return parseRSSItems(rss, maxItems);
+  // Fetch more than needed so deduplication has room to filter.
+  return parseRSSItems(rss, 15);
 }
 
 // ---------------------------------------------------------------------------
@@ -196,12 +225,18 @@ async function main() {
   // Epstein news
   try {
     process.stdout.write('Fetching Epstein news... ');
-    const items = await fetchGoogleNews('Epstein', 5);
+    const fetched = await fetchGoogleNews('Epstein');
+    const existingTitles = getExistingTitles(root, '.news-item');
+    const items = deduplicateWithinBatch(fetched)
+      .filter((i) => !existingTitles.has(normalizeTitle(i.title)))
+      .slice(0, 5);
     const container = root.querySelector('.news-items');
     if (container && items.length > 0) {
       container.innerHTML = items.map((i) => renderNewsItem(i, 'news-item')).join('') + '\n            ';
       anyUpdate = true;
-      console.log(`${items.length} articles fetched.`);
+      console.log(`${items.length} new articles (${fetched.length - items.length} duplicates skipped).`);
+    } else {
+      console.log('SKIPPED (no new articles).');
     }
   } catch (err) {
     console.log(`SKIPPED (${err.message})`);
@@ -210,7 +245,11 @@ async function main() {
   // Impeachment news
   try {
     process.stdout.write('Fetching impeachment news... ');
-    const items = await fetchGoogleNews('Trump impeachment', 2);
+    const fetched = await fetchGoogleNews('Trump impeachment');
+    const existingTitles = getExistingTitles(root, '.impeachment-item');
+    const items = deduplicateWithinBatch(fetched)
+      .filter((i) => !existingTitles.has(normalizeTitle(i.title)))
+      .slice(0, 2);
     const section = root.querySelector('.impeachment-section');
     if (section && items.length > 0) {
       const h2 = section.querySelector('h2');
@@ -218,7 +257,9 @@ async function main() {
         '\n            ' + h2.outerHTML + '\n' +
         items.map((i) => renderNewsItem(i, 'impeachment-item')).join('') + '\n        ';
       anyUpdate = true;
-      console.log(`${items.length} articles fetched.`);
+      console.log(`${items.length} new articles (${fetched.length - items.length} duplicates skipped).`);
+    } else {
+      console.log('SKIPPED (no new articles).');
     }
   } catch (err) {
     console.log(`SKIPPED (${err.message})`);
