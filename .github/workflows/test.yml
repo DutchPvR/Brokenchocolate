@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  schedule:
+    # Run link check weekly on Mondays at 09:00 UTC
+    - cron: "0 9 * * 1"
+
+jobs:
+  # HTML validation + content completeness — runs on every push/PR
+  test:
+    name: HTML & Content Tests
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Validate HTML
+        run: npm run test:html
+      - name: Check content completeness
+        run: npm run test:content
+
+  # Dead link detection — runs on the weekly schedule only
+  links:
+    name: Dead Link Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Check for broken links
+        run: npm run test:links
