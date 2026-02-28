@@ -75,8 +75,28 @@ function encodeAttr(str) {
 }
 
 // ---------------------------------------------------------------------------
-// RSS parser
+// Feed parsers
 // ---------------------------------------------------------------------------
+
+// Parses Reddit's Atom feed (uses <entry> + <link href="..."/>).
+function parseAtomEntries(xml, maxItems) {
+  const items = [];
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
+  let match;
+  while ((match = entryRegex.exec(xml)) !== null && items.length < maxItems) {
+    const block = match[1];
+    const titleMatch =
+      block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
+      block.match(/<title[^>]*>([\s\S]*?)<\/title>/);
+    const linkMatch = block.match(/<link[^>]+href="([^"]+)"/);
+    const title = titleMatch ? decodeEntities(titleMatch[1].trim()) : '';
+    const url = linkMatch ? linkMatch[1].trim() : '';
+    if (title && url) {
+      items.push({ title, url });
+    }
+  }
+  return items;
+}
 
 function parseRSSItems(xml, maxItems) {
   const items = [];
@@ -148,14 +168,8 @@ function deduplicateWithinBatch(items) {
 // ---------------------------------------------------------------------------
 
 async function fetchRedditPosts() {
-  const json = await get('https://www.reddit.com/r/Epstein/hot.json?limit=5&raw_json=1');
-  const data = JSON.parse(json);
-  return data.data.children.map((c) => ({
-    title: c.data.title,
-    url: `https://reddit.com${c.data.permalink}`,
-    upvotes: c.data.ups,
-    comments: c.data.num_comments,
-  }));
+  const rss = await get('https://www.reddit.com/r/Epstein/hot.rss');
+  return parseAtomEntries(rss, 5);
 }
 
 async function fetchGoogleNews(query) {
@@ -170,17 +184,11 @@ async function fetchGoogleNews(query) {
 // ---------------------------------------------------------------------------
 
 function renderRedditPost(post) {
-  const upvotes = post.upvotes.toLocaleString('en-US');
-  const comments = post.comments.toLocaleString('en-US');
   return `
             <div class="reddit-post">
                 <a href="${encodeAttr(post.url)}" target="_blank" rel="noopener">
                     <span class="post-title">${encodeText(post.title)}</span>
                 </a>
-                <div class="post-meta">
-                    <span class="upvotes">⬆️ ${upvotes}</span>
-                    <span class="comments">💬 ${comments} comments</span>
-                </div>
             </div>`;
 }
 
