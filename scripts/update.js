@@ -46,6 +46,38 @@ function get(url, headers = {}) {
   });
 }
 
+// Follows a redirect chain with HEAD requests and returns the final URL.
+// Used to unwrap Google News redirect URLs before writing them into the HTML.
+function resolveRedirect(url) {
+  return new Promise((resolve) => {
+    try {
+      const parsed = new URL(url);
+      const req = https.request({
+        hostname: parsed.hostname,
+        path: parsed.pathname + parsed.search,
+        method: 'HEAD',
+        headers: { 'User-Agent': 'brokenchocolate-updater/1.0 (https://github.com/DutchPvR/Brokenchocolate)' },
+      }, (res) => {
+        req.destroy();
+        if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+          const location = res.headers.location.startsWith('http')
+            ? res.headers.location
+            : `${parsed.protocol}//${parsed.host}${res.headers.location}`;
+          // Recurse to follow the full chain
+          resolveRedirect(location).then(resolve);
+        } else {
+          resolve(url);
+        }
+      });
+      req.on('error', () => resolve(url));
+      req.setTimeout(10000, () => { req.destroy(); resolve(url); });
+      req.end();
+    } catch {
+      resolve(url);
+    }
+  });
+}
+
 // ---------------------------------------------------------------------------
 // HTML encoding helpers
 // ---------------------------------------------------------------------------
@@ -75,8 +107,39 @@ function encodeAttr(str) {
 }
 
 // ---------------------------------------------------------------------------
-// RSS parser
+// Feed parsers
 // ---------------------------------------------------------------------------
+
+// Parses Reddit's Atom feed (uses <entry> + <link href="..."/>).
+// Reddit embeds upvote score and comment count as HTML inside <content>.
+function parseAtomEntries(xml, maxItems) {
+  const items = [];
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
+  let match;
+  while ((match = entryRegex.exec(xml)) !== null && items.length < maxItems) {
+    const block = match[1];
+    const titleMatch =
+      block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
+      block.match(/<title[^>]*>([\s\S]*?)<\/title>/);
+    const linkMatch = block.match(/<link[^>]+href="([^"]+)"/);
+    const title = titleMatch ? decodeEntities(titleMatch[1].trim()) : '';
+    const url = linkMatch ? linkMatch[1].trim() : '';
+
+    // The <content> field is HTML-encoded. Decode it and search for
+    // "X points" (upvote score) and "X comments" patterns.
+    const contentMatch = block.match(/<content[^>]*>([\s\S]*?)<\/content>/);
+    const content = contentMatch ? decodeEntities(contentMatch[1]) : '';
+    const scoreMatch = content.match(/([\d,]+)\s+points?/);
+    const commentMatch = content.match(/([\d,]+)\s+comments?/);
+    const upvotes = scoreMatch ? parseInt(scoreMatch[1].replace(/,/g, ''), 10) : null;
+    const comments = commentMatch ? parseInt(commentMatch[1].replace(/,/g, ''), 10) : null;
+
+    if (title && url) {
+      items.push({ title, url, upvotes, comments });
+    }
+  }
+  return items;
+}
 
 function parseRSSItems(xml, maxItems) {
   const items = [];
@@ -148,21 +211,20 @@ function deduplicateWithinBatch(items) {
 // ---------------------------------------------------------------------------
 
 async function fetchRedditPosts() {
-  const json = await get('https://www.reddit.com/r/Epstein/hot.json?limit=5&raw_json=1');
-  const data = JSON.parse(json);
-  return data.data.children.map((c) => ({
-    title: c.data.title,
-    url: `https://reddit.com${c.data.permalink}`,
-    upvotes: c.data.ups,
-    comments: c.data.num_comments,
-  }));
+  const rss = await get('https://www.reddit.com/r/Epstein/hot.rss');
+  return parseAtomEntries(rss, 5);
 }
 
 async function fetchGoogleNews(query) {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
   const rss = await get(url);
   // Fetch more than needed so deduplication has room to filter.
-  return parseRSSItems(rss, 15);
+  const items = parseRSSItems(rss, 15);
+  // Resolve Google News redirect URLs in parallel to get the real article URLs.
+  const resolved = await Promise.all(
+    items.map(async (item) => ({ ...item, link: await resolveRedirect(item.link) }))
+  );
+  return resolved;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,17 +232,17 @@ async function fetchGoogleNews(query) {
 // ---------------------------------------------------------------------------
 
 function renderRedditPost(post) {
-  const upvotes = post.upvotes.toLocaleString('en-US');
-  const comments = post.comments.toLocaleString('en-US');
+  const metaParts = [];
+  if (post.upvotes != null) metaParts.push(`<span class="upvotes">⬆️ ${post.upvotes.toLocaleString('en-US')}</span>`);
+  if (post.comments != null) metaParts.push(`<span class="comments">💬 ${post.comments.toLocaleString('en-US')} comments</span>`);
+  const metaHtml = metaParts.length > 0
+    ? `\n                <div class="post-meta">\n                    ${metaParts.join('\n                    ')}\n                </div>`
+    : '';
   return `
             <div class="reddit-post">
                 <a href="${encodeAttr(post.url)}" target="_blank" rel="noopener">
                     <span class="post-title">${encodeText(post.title)}</span>
-                </a>
-                <div class="post-meta">
-                    <span class="upvotes">⬆️ ${upvotes}</span>
-                    <span class="comments">💬 ${comments} comments</span>
-                </div>
+                </a>${metaHtml}
             </div>`;
 }
 
