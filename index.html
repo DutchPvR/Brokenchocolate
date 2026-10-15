@@ -6,12 +6,48 @@
 <title>broken chocolate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kablammo&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kablammo:MORF@0..60&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; height: 100%; background: #000; color: #fff; }
-  body { display: flex; align-items: center; justify-content: center;
-         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-  h1 { margin: 0; font-family: "Kablammo", cursive; font-weight: 400; font-size: clamp(2rem, 8vw, 5rem); text-align: center; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden; }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, #1a0630 0%, #000 60%);
+    background-size: 200% 200%;
+    animation: haze 14s ease-in-out infinite alternate;
+  }
+  h1 {
+    margin: 0; padding: 0 16px; text-align: center;
+    font-family: "Kablammo", cursive; font-weight: 400;
+    font-size: clamp(2.5rem, 10vw, 6rem);
+    color: #fff;
+    animation:
+      morph 9s ease-in-out infinite alternate,
+      glow 7s ease-in-out infinite alternate,
+      drift 11s ease-in-out infinite;
+  }
+  @keyframes morph {
+    from { font-variation-settings: "MORF" 0; }
+    to   { font-variation-settings: "MORF" 60; }
+  }
+  @keyframes glow {
+    0%   { color: #fff;    text-shadow: 0 0 12px #8a2be2aa, 0 0 40px #6a0dad66; }
+    50%  { color: #e6d0ff; text-shadow: 0 0 20px #b266ffcc, 0 0 70px #8a2be288; }
+    100% { color: #c9a0ff; text-shadow: 0 0 16px #da70d6aa, 0 0 55px #9932cc77; }
+  }
+  @keyframes drift {
+    0%, 100% { transform: skewX(0deg) scale(1); }
+    25%      { transform: skewX(-4deg) scale(1.03, 0.98); }
+    50%      { transform: skewX(0deg) scale(0.98, 1.03); }
+    75%      { transform: skewX(4deg) scale(1.02, 0.99); }
+  }
+  @keyframes haze {
+    from { background-position: 40% 45%; }
+    to   { background-position: 60% 55%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body, h1 { animation: none; }
+    h1 { text-shadow: 0 0 16px #8a2be2aa; }
+  }
 </style>
 </head>
 <body>
