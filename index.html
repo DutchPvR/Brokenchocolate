@@ -23,6 +23,16 @@
     filter: url(#water);
     animation: glow 8s ease-in-out infinite alternate;
   }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: none; touch-action: none; }
+
+  /* Interactive (WebGL) mode: canvas draws the title; h1 stays for screen readers */
+  body.gl { animation: none; background: #000; }
+  body.gl canvas { display: block; }
+  body.gl h1 {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; filter: none; animation: none;
+  }
+
   @keyframes glow {
     0%   { color: #fff;    text-shadow: 0 0 12px #8a2be2aa, 0 0 40px #6a0dad66; }
     50%  { color: #e6d0ff; text-shadow: 0 0 20px #b266ffcc, 0 0 70px #8a2be288; }
@@ -49,5 +59,189 @@
   </filter>
 </svg>
 <h1>broken chocolate</h1>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.getElementById('c');
+  const gl = cv.getContext('webgl', { antialias: false, alpha: false });
+  if (!gl) return; // falls back to the CSS/SVG version
+
+  const VS = `attribute vec2 a; varying vec2 v;
+    void main(){ v = vec2(a.x*.5+.5, .5-a.y*.5); gl_Position = vec4(a,0.,1.); }`;
+  const FS = `precision mediump float;
+    uniform sampler2D uText, uH; uniform vec2 uTexel; uniform float uT; varying vec2 v;
+    void main(){
+      float hl = texture2D(uH, v - vec2(uTexel.x,0.)).r;
+      float hr = texture2D(uH, v + vec2(uTexel.x,0.)).r;
+      float hu = texture2D(uH, v - vec2(0.,uTexel.y)).r;
+      float hd = texture2D(uH, v + vec2(0.,uTexel.y)).r;
+      vec2 g = vec2(hr-hl, hd-hu);
+      vec2 amb = vec2(sin(v.y*22.+uT*.9) + .6*sin(v.y*9.-uT*.55+v.x*4.),
+                      cos(v.x*14.+uT*.7) + .6*sin(v.x*31.-uT*.45)) * .0028;
+      vec2 o = g*.38 + amb;
+      vec3 c;
+      c.r = texture2D(uText, v + o*1.3).r;
+      c.g = texture2D(uText, v + o).g;
+      c.b = texture2D(uText, v + o*.7).b;
+      c *= mix(vec3(1.), vec3(.82,.66,1.), .5+.5*sin(uT*.45));
+      c += vec3(.45,.15,.85) * clamp(length(g)*6.,0.,1.) * .5;
+      gl_FragColor = vec4(c,1.);
+    }`;
+
+  function shader(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  const prog = gl.createProgram();
+  try {
+    gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+  } catch (e) { return; }
+  gl.useProgram(prog);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const aLoc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(aLoc);
+  gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+
+  function makeTex(unit) {
+    const t = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return t;
+  }
+  const tText = makeTex(0), tH = makeTex(1);
+  const U = n => gl.getUniformLocation(prog, n);
+  gl.uniform1i(U('uText'), 0); gl.uniform1i(U('uH'), 1);
+  const uTexel = U('uTexel'), uT = U('uT');
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+
+  // Offscreen canvas holding the title artwork
+  const tc = document.createElement('canvas'), tx = tc.getContext('2d');
+  const WORDS = 'broken chocolate';
+  let dpr = 1, GW = 0, GH = 0, cur, prev, bytes;
+
+  function drawText() {
+    const w = tc.width = cv.width, h = tc.height = cv.height;
+    const bg = tx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.6);
+    bg.addColorStop(0, '#1a0630'); bg.addColorStop(1, '#000');
+    tx.fillStyle = bg; tx.fillRect(0, 0, w, h);
+
+    let fs = Math.min(112, Math.max(40, innerWidth * 0.11)) * dpr;
+    const font = s => `400 ${s}px "Rubik Wet Paint", cursive`;
+    tx.font = font(fs);
+    const maxW = w - 32 * dpr;
+    let lines = [WORDS];
+    if (tx.measureText(WORDS).width > maxW) {
+      lines = ['broken', 'chocolate'];
+      const widest = Math.max(...lines.map(l => tx.measureText(l).width));
+      if (widest > maxW) { fs *= maxW / widest; tx.font = font(fs); }
+    }
+    tx.textAlign = 'center'; tx.textBaseline = 'middle';
+    const lh = fs * 1.1, y0 = h/2 - (lines.length - 1) * lh / 2;
+    const paint = () => lines.forEach((l, i) => tx.fillText(l, w/2, y0 + i * lh));
+    tx.fillStyle = '#fff';
+    tx.shadowColor = 'rgba(138,43,226,0.55)'; tx.shadowBlur = 70 * dpr; paint();
+    tx.shadowColor = 'rgba(178,102,255,0.85)'; tx.shadowBlur = 22 * dpr; paint();
+    tx.shadowBlur = 0;
+
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tText);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, tc);
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr);
+    gl.viewport(0, 0, cv.width, cv.height);
+    const cell = Math.max(innerWidth, innerHeight) / 300;
+    GW = Math.ceil(innerWidth / cell); GH = Math.ceil(innerHeight / cell);
+    cur = new Float32Array(GW * GH); prev = new Float32Array(GW * GH); bytes = new Uint8Array(GW * GH);
+    gl.uniform2f(uTexel, 1 / GW, 1 / GH);
+    drawText();
+  }
+
+  // Water simulation (classic two-buffer height field)
+  function step() {
+    for (let y = 1; y < GH - 1; y++) {
+      for (let x = 1, i = y * GW + 1; x < GW - 1; x++, i++) {
+        prev[i] = ((cur[i-1] + cur[i+1] + cur[i-GW] + cur[i+GW]) * 0.5 - prev[i]) * 0.985;
+      }
+    }
+    const t = cur; cur = prev; prev = t;
+  }
+
+  function drop(px, py, r, s) {
+    const gx = px / innerWidth * GW, gy = py / innerHeight * GH;
+    const x0 = Math.max(1, Math.floor(gx - r)), x1 = Math.min(GW - 2, Math.ceil(gx + r));
+    const y0 = Math.max(1, Math.floor(gy - r)), y1 = Math.min(GH - 2, Math.ceil(gy + r));
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      const d = Math.hypot(x - gx, y - gy);
+      if (d < r) cur[y * GW + x] += s * (0.5 + 0.5 * Math.cos(Math.PI * d / r));
+    }
+  }
+
+  // Pointer / touch input
+  let last = null;
+  function trail(x, y) {
+    if (last) {
+      const dist = Math.hypot(x - last.x, y - last.y);
+      const s = Math.min(0.7, 0.1 + dist * 0.012);
+      const n = Math.max(1, Math.ceil(dist / (innerWidth / GW * 2)));
+      for (let k = 1; k <= n; k++) {
+        drop(last.x + (x - last.x) * k / n, last.y + (y - last.y) * k / n, 3, s / Math.sqrt(n));
+      }
+    }
+    last = { x, y };
+  }
+  cv.addEventListener('pointerdown', e => { drop(e.clientX, e.clientY, 7, 2.2); last = { x: e.clientX, y: e.clientY }; });
+  cv.addEventListener('pointermove', e => {
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    (evs.length ? evs : [e]).forEach(ev => trail(ev.clientX, ev.clientY));
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { last = null; }));
+
+  let nextDrip = 0, acc = 0, prevT = 0;
+  function frame(t) {
+    acc += Math.min(100, t - (prevT || t)); prevT = t;
+    let n = 0;
+    while (acc >= 16.67 && n < 3) { step(); acc -= 16.67; n++; }
+    if (n === 3) acc = 0;
+    if (t > nextDrip) { // gentle ambient drips near the title
+      drop(innerWidth * (0.2 + Math.random() * 0.6), innerHeight * (0.35 + Math.random() * 0.3), 3, 0.5);
+      nextDrip = t + 1200 + Math.random() * 2400;
+    }
+    for (let i = 0; i < bytes.length; i++) {
+      const b = 128 + cur[i] * 90;
+      bytes[i] = b < 0 ? 0 : b > 255 ? 255 : b;
+    }
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tH);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, GW, GH, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, bytes);
+    gl.uniform1f(uT, t / 1000);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(frame);
+  }
+
+  function start() {
+    resize();
+    addEventListener('resize', resize);
+    document.body.classList.add('gl');
+    requestAnimationFrame(frame);
+  }
+  const fontReady = () => Promise.race([
+    document.fonts.load('400 100px "Rubik Wet Paint"'),
+    new Promise(r => setTimeout(r, 2500))
+  ]);
+  if (document.readyState === 'complete') fontReady().then(start);
+  else addEventListener('load', () => fontReady().then(start));
+})();
+</script>
 </body>
 </html>
